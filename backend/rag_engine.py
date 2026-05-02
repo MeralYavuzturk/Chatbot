@@ -5,7 +5,6 @@ from sentence_transformers import SentenceTransformer
 from groq import Groq
 
 load_dotenv()
-print("API:", os.getenv("GROQ_API_KEY"))
 COLLECTION_NAME = "project_documents"
 
 qdrant = QdrantClient(host="localhost", port=6333)
@@ -14,12 +13,13 @@ embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
-def search_documents(question: str, limit: int = 5):
+def search_documents(question: str, limit: int = 8):
     query_vector = embedding_model.encode(question).tolist()
 
     results = qdrant.query_points(
         collection_name=COLLECTION_NAME,
         query=query_vector,
+        with_payload=True,
         limit=limit
     )
 
@@ -29,19 +29,28 @@ def search_documents(question: str, limit: int = 5):
 def ask_rag(question: str):
     results = search_documents(question)
 
-    context = "\n\n---\n\n".join([
-        f"Kaynak: {r.payload.get('file_name')}, Sayfa: {r.payload.get('page')}\n{r.payload.get('text')}"
-        for r in results
-    ])
+    context_parts = []
+    for r in results:
+        text = r.payload.get('text', '')
+        file_name = r.payload.get('file_name', 'Bilinmeyen')
+        page = r.payload.get('page', '?')
+        context_parts.append(f"--- KAYNAK: {file_name} (Sayfa {page}) ---\n{text}")
+
+    context = "\n\n".join(context_parts)
 
     prompt = f"""
-Sen bir doküman asistanısın.
-Sadece aşağıdaki doküman bağlamına göre cevap ver.
-Cevap belgelerde yoksa "Bu bilgi yüklenen belgelerde bulunamadı." de.
-Cevabı Türkçe, açık ve kısa yaz.
+Sen, T.C. Sağlık Bakanlığı rehberleri ve tıbbi dökümanlar konusunda uzmanlaşmış, son derece detaycı bir sağlık asistanısın. Kullanıcının sorusuna, elindeki doküman bağlamını kullanarak mümkün olan en kapsamlı, detaylı ve açıklayıcı cevabı ver.
 
-KULLANICI SORUSU:
-{question}
+TALİMATLAR:
+1. SADECE verilen "DOKÜMAN BAĞLAMI" içindeki bilgilere dayanarak cevap ver.
+2. Cevabını mümkün olduğunca uzun, detaylı ve kapsamlı tut. Kısa cevaplardan kaçın.
+3. Konuyu açıklarken neden-sonuç ilişkisi kur, eğer belgelerde varsa istatistikleri, önerileri ve uyarıları mutlaka ekle.
+4. Bilgiler doğrudan mevcut değilse ama belgelerden mantıklı bir çıkarım yapılabiliyorsa, bu çıkarımı "Belgelere dayanarak..." diyerek detaylandır.
+5. Cevaplarını hem paragraflar hem de detaylı maddeler kullanarak yapılandır.
+6. Eğer hiçbir şekilde bilgi yoksa "Üzgünüm, bu konu hakkında yüklü belgelerde yeterli detayda bilgi bulunamadı." de.
+7. Eğer cevap kaynaklarda yoksa ve verilen cevap api üzerinden sağlandıysa bunu mutlaka belirt. 
+
+KULLANICI SORUSU: {question}
 
 DOKÜMAN BAĞLAMI:
 {context}
@@ -50,10 +59,10 @@ DOKÜMAN BAĞLAMI:
     completion = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
-            {"role": "system", "content": "Sen kaynaklı cevap veren bir RAG doküman asistanısın."},
+            {"role": "system", "content": "Sen güvenilir, son derece detaylı ve açıklayıcı cevaplar veren profesyonel bir tıbbi asistanısın."},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.2
+        temperature=0.35
     )
 
     sources = [
