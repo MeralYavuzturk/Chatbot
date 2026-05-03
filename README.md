@@ -82,6 +82,9 @@ Sistem şu an aşağıdaki resmi rehberler üzerinde uzmanlaşmıştır:
 *   Obezite ile Mücadele ve Egzersiz Stratejileri.
 *   Kronik Hastalıklarda Fiziksel Aktivite Rehberliği.
 
+## 📄 Lisans
+Bu proje **MIT Lisansı** ile lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakabilirsiniz.
+
 ---
 
 **⚠️ Önemli Uyarı:** Bu uygulama bilgilendirme amaçlıdır. Tıbbi kararlar almadan önce mutlaka profesyonel bir sağlık uzmanına danışılmalıdır.
