@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pypdf import PdfReader
 from qdrant_client import QdrantClient
-from qdrant_client.models import PointStruct
+from qdrant_client.models import PointStruct, VectorParams, Distance
 from sentence_transformers import SentenceTransformer
 
 
@@ -13,6 +13,14 @@ DOCS_DIR = Path("docs")
 
 client = QdrantClient(host="localhost", port=6333)
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+# Koleksiyonu oluştur (eğer yoksa)
+if not client.collection_exists(COLLECTION_NAME):
+    print(f"Koleksiyon oluşturuluyor: {COLLECTION_NAME}")
+    client.create_collection(
+        collection_name=COLLECTION_NAME,
+        vectors_config=VectorParams(size=384, distance=Distance.COSINE),
+    )
 
 
 def chunk_text(text, chunk_size=800, overlap=150):

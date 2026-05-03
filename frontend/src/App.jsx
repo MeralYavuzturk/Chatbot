@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  FileText, 
-  Send, 
-  Paperclip, 
-  Bot, 
-  User, 
-  Circle, 
+import {
+  FileText,
+  Send,
+  Bot,
+  User,
+  Circle,
   Loader2
 } from 'lucide-react';
 
@@ -56,7 +55,7 @@ const App = () => {
       if (!response.ok) throw new Error('API hatası oluştu');
 
       const data = await response.json();
-      
+
       const botMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
@@ -95,13 +94,12 @@ const App = () => {
           <h2 className="text-lg font-bold text-slate-700 mb-6">İndekslenen Belgeler</h2>
           <div className="space-y-3">
             {documents.map((doc) => (
-              <div 
+              <div
                 key={doc.id}
-                className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ${
-                  doc.active 
-                    ? 'bg-[#e0f7fa] text-[#00acc1] border border-[#00acc1]/20 shadow-sm' 
+                className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ${doc.active
+                    ? 'bg-[#e0f7fa] text-[#00acc1] border border-[#00acc1]/20 shadow-sm'
                     : 'text-slate-500 hover:bg-slate-50'
-                }`}
+                  }`}
               >
                 <FileText size={18} />
                 <span className="font-medium text-sm">{doc.name}</span>
@@ -113,11 +111,11 @@ const App = () => {
 
         <div className="mt-auto">
           <div className="rounded-2xl overflow-hidden shadow-lg aspect-square bg-white p-4 border border-slate-100">
-             <img 
-               src="/heart-logo.png" 
-               alt="Medical context" 
-               className="w-full h-full object-contain"
-             />
+            <img
+              src="/heart-logo.png"
+              alt="Medical context"
+              className="w-full h-full object-contain"
+            />
           </div>
         </div>
       </aside>
@@ -141,29 +139,27 @@ const App = () => {
         {/* Chat Area */}
         <div className="flex-1 overflow-y-auto p-8 space-y-8 pb-40">
           {messages.map((msg) => (
-            <div 
-              key={msg.id} 
+            <div
+              key={msg.id}
               className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}
             >
               <div className={`flex max-w-[85%] md:max-w-[70%] ${msg.type === 'user' ? 'flex-row-reverse' : 'flex-row'} items-start gap-4`}>
-                <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${
-                  msg.type === 'user' ? 'bg-[#00acc1]' : 'bg-[#e0f7fa] text-[#00acc1]'
-                }`}>
+                <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${msg.type === 'user' ? 'bg-[#00acc1]' : 'bg-[#e0f7fa] text-[#00acc1]'
+                  }`}>
                   {msg.type === 'bot' ? <Bot size={20} /> : <User size={20} className="text-white" />}
                 </div>
-                
-                <div className={`p-5 rounded-2xl shadow-sm ${
-                  msg.type === 'user' 
-                    ? 'bg-[#00acc1] text-white rounded-tr-none' 
+
+                <div className={`p-5 rounded-2xl shadow-sm ${msg.type === 'user'
+                    ? 'bg-[#00acc1] text-white rounded-tr-none'
                     : 'bg-white border border-slate-100 rounded-tl-none'
-                }`}>
+                  }`}>
                   <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{msg.text}</p>
-                  
+
                   {msg.sources && msg.sources.length > 0 && (
                     <div className="mt-4 flex flex-wrap gap-2">
                       {msg.sources.map((source, idx) => (
-                        <div 
-                          key={idx} 
+                        <div
+                          key={idx}
                           className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-500 rounded-full text-[11px] font-medium border border-slate-200"
                         >
                           <Circle size={10} fill="currentColor" />
@@ -194,11 +190,8 @@ const App = () => {
             <div className="relative group">
               <div className="absolute inset-0 bg-[#00acc1]/10 blur-xl group-focus-within:bg-[#00acc1]/20 transition-all rounded-3xl"></div>
               <div className="relative bg-white rounded-2xl shadow-xl border border-slate-100 flex items-center p-2">
-                <button className="p-3 text-slate-400 hover:text-[#00acc1] transition-colors">
-                  <Paperclip size={20} />
-                </button>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSend()}
@@ -206,7 +199,7 @@ const App = () => {
                   className="flex-1 bg-transparent border-none focus:ring-0 text-sm px-2 text-slate-700"
                   disabled={isLoading}
                 />
-                <button 
+                <button
                   onClick={handleSend}
                   disabled={isLoading || !input.trim()}
                   className="w-12 h-12 bg-[#00acc1] text-white rounded-xl flex items-center justify-center hover:bg-[#0097a7] transition-all shadow-lg hover:scale-105 active:scale-95 disabled:bg-slate-300 disabled:scale-100"
